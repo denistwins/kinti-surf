@@ -1,0 +1,23 @@
+name: Validate Kinti Surf Widget
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kinti-surf-floating.js'
+      - 'surf-engine.js'
+      - '.github/workflows/lint-widget.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check surf-engine.js
+          node --check kinti-surf-floating.js
