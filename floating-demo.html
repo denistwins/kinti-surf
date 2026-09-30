@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kinti Surf · Floating demo</title>
+  <style>
+    html,body{margin:0;min-height:100%;font-family:Inter,system-ui,sans-serif;background:#eee8dc;color:#182b2c}
+    .hero{min-height:100vh;padding:72px 7vw;background:linear-gradient(135deg,#f7f2e8,#ddd3c1);display:grid;align-content:center}
+    .hero p{letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:#6c7772}
+    .hero h1{font:500 clamp(54px,8vw,110px)/.95 Georgia,serif;margin:14px 0;max-width:900px;letter-spacing:-.04em}
+    .hero span{max-width:520px;font-size:18px;line-height:1.55;color:#5c6763}
+  </style>
+</head>
+<body>
+  <main class="hero">
+    <p>Kinti · Máncora</p>
+    <h1>Máncora a otro ritmo.</h1>
+    <span>Demo de integración del nuevo Kinti Surf como botón flotante independiente.</span>
+  </main>
+  <kinti-surf-floating></kinti-surf-floating>
+  <script type="module" src="./kinti-surf-floating.js"></script>
+</body>
+</html>
