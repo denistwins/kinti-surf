@@ -1,8 +1,11 @@
 name: Update Kinti Surf
 
 on:
+  # Refresh the source forecast every 3 hours. The public widget itself
+  # re-reads the generated JSON every hour, so visitors get an hourly refresh
+  # without hammering NOAA NOMADS with ~25 GRIB requests every hour.
   schedule:
-    - cron: '7 * * * *'
+    - cron: '17 */3 * * *'
   workflow_dispatch:
 
 permissions:
