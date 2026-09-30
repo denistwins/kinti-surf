@@ -40,8 +40,14 @@ def fetch_waves(start: datetime, end: datetime) -> pd.DataFrame:
 
 
 def fetch_sea_level(start: datetime, end: datetime) -> pd.DataFrame:
-    df = _read(COPERNICUS_SEA_LEVEL, ["zos"], start, end)
-    return df.rename(columns={"zos": "sea_level_m"})
+    # MOL (Merged Ocean Level) exposes the tidal elevation separately from the
+    # total sea level. For surf timing we use ocean_tide as the tide signal and
+    # keep total_sea_level as useful diagnostic context.
+    df = _read(COPERNICUS_SEA_LEVEL, ["ocean_tide", "total_sea_level"], start, end)
+    return df.rename(columns={
+        "ocean_tide": "tide_elevation_m",
+        "total_sea_level": "total_sea_level_m",
+    })
 
 
 def fetch_currents(start: datetime, end: datetime) -> pd.DataFrame:
@@ -49,8 +55,11 @@ def fetch_currents(start: datetime, end: datetime) -> pd.DataFrame:
         df = _read(COPERNICUS_SURFACE_CURRENT, ["utotal", "vtotal"], start, end)
         u, v = "utotal", "vtotal"
     except Exception:
+        # Fallback to the general-circulation component if the merged total is
+        # temporarily unavailable.
         df = _read(COPERNICUS_SURFACE_CURRENT, ["uo", "vo"], start, end)
         u, v = "uo", "vo"
     df["current_speed_ms"] = (df[u] ** 2 + df[v] ** 2) ** 0.5
+    # Ocean-current bearing: direction TOWARD which the current moves.
     df["current_direction_deg"] = (df.apply(lambda r: math.degrees(math.atan2(r[u], r[v])), axis=1) + 360) % 360
     return df[["time", "current_speed_ms", "current_direction_deg"]]
