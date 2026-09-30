@@ -53,20 +53,24 @@ def normalize_tide(series):
 
 def build():
     now = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
-    end = now + timedelta(hours=30)
+    # 24 hours is enough to find today's/next daylight window while keeping
+    # NOAA NOMADS traffic modest during the prototype phase.
+    end = now + timedelta(hours=24)
     waves = hourly_wave_frame(fetch_waves(now - timedelta(hours=3), end + timedelta(hours=3)), now, end)
 
     sea = fetch_sea_level(now, end)
     sea["time"] = pd.to_datetime(sea["time"], utc=True)
     sea = sea.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
-    sea["tide_level_norm"] = normalize_tide(sea["sea_level_m"])
-    sea["tide_trend"] = sea["sea_level_m"].diff().fillna(0).map(lambda x: "rising" if x > .005 else "falling" if x < -.005 else "steady")
+    sea["tide_level_norm"] = normalize_tide(sea["tide_elevation_m"])
+    sea["tide_trend"] = sea["tide_elevation_m"].diff().fillna(0).map(
+        lambda x: "rising" if x > .005 else "falling" if x < -.005 else "steady"
+    )
 
     cur = fetch_currents(now, end)
     cur["time"] = pd.to_datetime(cur["time"], utc=True)
     cur = cur.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
 
-    wind = pd.DataFrame(fetch_wind(30))
+    wind = pd.DataFrame(fetch_wind(24))
     wind["time"] = pd.to_datetime(wind["time"], utc=True)
     wind = wind.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
 
@@ -79,22 +83,37 @@ def build():
             "swellHeightM": round(float(w.get("swell_height_m", w.get("wave_height_m", float('nan')))), 3),
             "swellPeriodS": round(float(w.get("swell_period_s", w.get("wave_peak_period_s", float('nan')))), 2),
             "swellDirectionDeg": round(float(w.get("swell_direction_deg", float('nan'))), 1),
+            "waveHeightM": None if pd.isna(w.get("wave_height_m")) else round(float(w.get("wave_height_m")), 3),
             "windSpeedKmh": round(float(g["wind_speed_kmh"]), 1),
             "windDirectionDeg": round(float(g["wind_direction_deg"]), 1),
             "gustKmh": None if pd.isna(g.get("gust_kmh")) else round(float(g["gust_kmh"]), 1),
+            "tideElevationM": round(float(s["tide_elevation_m"]), 3),
             "tideLevelNorm": round(float(s["tide_level_norm"]), 3),
             "tideTrend": s["tide_trend"],
             "currentSpeedMs": round(float(c["current_speed_ms"]), 3),
             "currentDirectionDeg": round(float(c["current_direction_deg"]), 1),
-            "waveDataAgeHours": 0,
+            # Copernicus does not expose the wave model run timestamp through
+            # this lightweight read call, so don't pretend the age is known.
+            "waveDataAgeHours": None,
             "weatherDataAgeHours": max(0, round((now - model_run).total_seconds() / 3600, 1))
         })
 
     payload = {
         "schemaVersion": 1,
         "generatedAt": now.isoformat().replace('+00:00','Z'),
-        "spot": {"name": SPOT["name"], "breakLat": SPOT["break_lat"], "breakLon": SPOT["break_lon"], "oceanReferenceLat": SPOT["ocean_lat"], "oceanReferenceLon": SPOT["ocean_lon"]},
-        "source": {"mode": "live", "wave": "Copernicus Marine", "weather": "NOAA GFS / NOMADS"},
+        "spot": {
+            "name": SPOT["name"],
+            "breakLat": SPOT["break_lat"],
+            "breakLon": SPOT["break_lon"],
+            "oceanReferenceLat": SPOT["ocean_lat"],
+            "oceanReferenceLon": SPOT["ocean_lon"]
+        },
+        "source": {
+            "mode": "live",
+            "wave": "Copernicus Marine",
+            "weather": "NOAA GFS / NOMADS",
+            "weatherModelRun": model_run.isoformat().replace('+00:00','Z')
+        },
         "hours": records
     }
     out = ROOT / "data" / "surf-data.json"
