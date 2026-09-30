@@ -60,7 +60,8 @@ def build():
 
     sea = fetch_sea_level(now, end)
     sea["time"] = pd.to_datetime(sea["time"], utc=True)
-    sea = sea.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
+    sea = sea.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index)
+    sea[["tide_elevation_m", "total_sea_level_m"]] = sea[["tide_elevation_m", "total_sea_level_m"]].interpolate(method="time")
     sea["tide_level_norm"] = normalize_tide(sea["tide_elevation_m"])
     sea["tide_trend"] = sea["tide_elevation_m"].diff().fillna(0).map(
         lambda x: "rising" if x > .005 else "falling" if x < -.005 else "steady"
@@ -68,13 +69,19 @@ def build():
 
     cur = fetch_currents(now, end)
     cur["time"] = pd.to_datetime(cur["time"], utc=True)
-    cur = cur.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
+    cur = cur.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index)
+    cur[["current_speed_ms", "current_direction_deg"]] = cur[["current_speed_ms", "current_direction_deg"]].interpolate(method="time")
 
     wind = pd.DataFrame(fetch_wind(24))
     wind["time"] = pd.to_datetime(wind["time"], utc=True)
-    wind = wind.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index).interpolate(method="time")
+    if "model_run" in wind.columns and wind["model_run"].notna().any():
+        model_run = pd.to_datetime(wind["model_run"].dropna().iloc[0], utc=True).to_pydatetime()
+    else:
+        model_run = now
+    wind = wind.drop(columns=["model_run"], errors="ignore")
+    wind = wind.drop_duplicates("time").set_index("time").sort_index().reindex(waves.index)
+    wind[["wind_speed_kmh", "wind_direction_deg", "gust_kmh"]] = wind[["wind_speed_kmh", "wind_direction_deg", "gust_kmh"]].interpolate(method="time")
 
-    model_run = pd.to_datetime(wind["model_run"].dropna().iloc[0], utc=True).to_pydatetime() if "model_run" in wind and wind["model_run"].notna().any() else now
     records = []
     for ts in waves.index:
         w, s, c, g = waves.loc[ts], sea.loc[ts], cur.loc[ts], wind.loc[ts]
