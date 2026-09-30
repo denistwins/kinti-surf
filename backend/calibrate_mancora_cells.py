@@ -41,7 +41,6 @@ def main() -> None:
     start = now - timedelta(hours=6)
     end = now + timedelta(hours=6)
 
-    # Small box around the break, extending offshore (west) and slightly N/S.
     west, east = -81.32, -81.055
     south, north = -4.22, -3.99
 
@@ -78,7 +77,6 @@ def main() -> None:
     for col in numeric:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Remove land / invalid cells and pick the time closest to 'now'.
     valid = df.dropna(subset=["VHM0", "VHM0_SW1"]).copy()
     if valid.empty:
         fail("No encontramos celdas oceánicas válidas en la caja.")
@@ -91,26 +89,35 @@ def main() -> None:
         lambda r: haversine_km(SPOT["break_lat"], SPOT["break_lon"], float(r["latitude"]), float(r["longitude"])),
         axis=1,
     )
+    # Approximate alongshore displacement using latitude, and offshore displacement
+    # using longitude. Around Máncora the ocean is predominantly west of the break,
+    # so we prefer cells that move west without drifting far north/south.
+    snap["lat_offset_km"] = (snap["latitude"] - SPOT["break_lat"]).abs() * 111.0
+    snap["west_offset_km"] = (SPOT["break_lon"] - snap["longitude"]) * 111.0 * cos(radians(SPOT["break_lat"]))
     snap["band"] = pd.cut(
         snap["distance_km"],
         bins=[-0.1, 4, 8, 15, 25, 1000],
         labels=["muy costera", "costera", "offshore ideal", "offshore", "lejana"],
     )
-    snap = snap.sort_values(["distance_km", "longitude"]).reset_index(drop=True)
+    snap = snap.sort_values(["distance_km", "lat_offset_km"]).reset_index(drop=True)
 
-    # Keep a compact list; the preferred candidate is the nearest valid cell in
-    # the 8–15 km band. If none exists, use the nearest 4–25 km cell.
-    preferred_pool = snap[(snap["distance_km"] >= 8) & (snap["distance_km"] <= 15)]
+    preferred_pool = snap[
+        (snap["distance_km"] >= 8)
+        & (snap["distance_km"] <= 15)
+        & (snap["west_offset_km"] > 0)
+    ].copy()
     if preferred_pool.empty:
-        preferred_pool = snap[(snap["distance_km"] >= 4) & (snap["distance_km"] <= 25)]
+        preferred_pool = snap[(snap["distance_km"] >= 4) & (snap["distance_km"] <= 25) & (snap["west_offset_km"] > 0)].copy()
     if preferred_pool.empty:
-        preferred_pool = snap
-    preferred = preferred_pool.iloc[0]
+        preferred_pool = snap.copy()
 
-    cols = ["latitude", "longitude", "distance_km", "band", "VHM0_SW1", "VTM01_SW1", "VMDR_SW1", "VHM0", "VTPK"]
+    # Strongly prefer low alongshore drift, then a useful offshore displacement.
+    preferred_pool["selection_score"] = preferred_pool["lat_offset_km"] * 3 + (preferred_pool["distance_km"] - 12).abs()
+    preferred = preferred_pool.sort_values("selection_score").iloc[0]
+
+    cols = ["latitude", "longitude", "distance_km", "lat_offset_km", "west_offset_km", "band", "VHM0_SW1", "VTM01_SW1", "VMDR_SW1", "VHM0", "VTPK"]
     shown = snap[cols].head(12).copy()
-    shown["distance_km"] = shown["distance_km"].round(1)
-    for col in ["VHM0_SW1", "VTM01_SW1", "VMDR_SW1", "VHM0", "VTPK"]:
+    for col in ["distance_km", "lat_offset_km", "west_offset_km", "VHM0_SW1", "VTM01_SW1", "VMDR_SW1", "VHM0", "VTPK"]:
         shown[col] = shown[col].round(2)
 
     print(f"\nInstantánea comparada: {nearest_time.strftime('%Y-%m-%d %H:%M UTC')}")
@@ -122,6 +129,7 @@ def main() -> None:
     print(f"latitude={preferred['latitude']:.6f}")
     print(f"longitude={preferred['longitude']:.6f}")
     print(f"distance_km={preferred['distance_km']:.1f}")
+    print(f"lat_offset_km={preferred['lat_offset_km']:.1f} | west_offset_km={preferred['west_offset_km']:.1f}")
     print(f"swell={preferred['VHM0_SW1']:.2f} m | period={preferred['VTM01_SW1']:.2f} s | dir={preferred['VMDR_SW1']:.1f}°")
     print(f"total_wave={preferred['VHM0']:.2f} m | peak_period={preferred['VTPK']:.2f} s")
     print("\nNota: esta selección es geométrica/operativa. La validaremos con varias corridas y observación local antes de fijarla definitivamente.")
