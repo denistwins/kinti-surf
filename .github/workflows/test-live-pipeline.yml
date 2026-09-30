@@ -7,9 +7,12 @@ on:
     paths:
       - '.github/workflows/test-live-pipeline.yml'
       - 'backend/update_surf.py'
+      - 'backend/score_live.mjs'
       - 'backend/providers/copernicus.py'
       - 'backend/providers/noaa.py'
       - 'backend/config.py'
+      - 'surf-engine.js'
+      - 'package.json'
 
 jobs:
   live-pipeline:
@@ -42,3 +45,5 @@ jobs:
           for row in data.get('hours', [])[:4]:
               print(row)
           PY
+      - name: Score live forecast and detect surf windows
+        run: node backend/score_live.mjs
