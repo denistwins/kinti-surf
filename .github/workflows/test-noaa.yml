@@ -1,0 +1,25 @@
+name: Test NOAA GFS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/test_noaa.py'
+      - 'backend/providers/noaa.py'
+      - '.github/workflows/test-noaa.yml'
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+      - name: Test NOAA GFS
+        run: python backend/test_noaa.py
