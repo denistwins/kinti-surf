@@ -11,10 +11,7 @@ const KINTI_PROFILE = {
 };
 
 const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
-const circularDiff = (a, b) => {
-  const d = Math.abs((((a - b) % 360) + 540) % 360 - 180);
-  return d;
-};
+const circularDiff = (a, b) => Math.abs((((a - b) % 360) + 540) % 360 - 180);
 
 function scoreByDiff(diff, max, stops) {
   for (const [limit, fraction] of stops) {
@@ -74,7 +71,7 @@ function scoreWindSpeed(kmh) {
 }
 
 function scoreTide(norm, trend) {
-  if (norm == null) return 6; // neutral if unavailable
+  if (norm == null) return 6;
   let s = norm <= .30 ? 9 : norm <= .65 ? 7 : 5;
   if (trend === 'falling') s += 1;
   if (trend === 'rising' && norm > .75) s -= 1;
@@ -134,11 +131,25 @@ export function scoreForecast(hours) {
   });
 }
 
+function localParts(iso) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: KINTI_PROFILE.timezone,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  }).formatToParts(new Date(iso));
+}
+
+function localDateKey(iso) {
+  const p = localParts(iso);
+  const get = type => p.find(x => x.type === type)?.value;
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+
 function localHour(iso) {
-  const d = new Date(iso);
-  const parts = new Intl.DateTimeFormat('en-US', { timeZone: KINTI_PROFILE.timezone, hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(d);
-  const hour = Number(parts.find(p=>p.type==='hour')?.value ?? 0);
-  const minute = Number(parts.find(p=>p.type==='minute')?.value ?? 0);
+  const p = localParts(iso);
+  let hour = Number(p.find(x=>x.type==='hour')?.value ?? 0);
+  if (hour === 24) hour = 0;
+  const minute = Number(p.find(x=>x.type==='minute')?.value ?? 0);
   return hour + minute / 60;
 }
 
@@ -147,27 +158,44 @@ function isDaylight(iso) {
   return h >= KINTI_PROFILE.daylight.startHour && h <= KINTI_PROFILE.daylight.endHour;
 }
 
+function areHourlyNeighbors(a, b) {
+  const dt = new Date(b.timestamp) - new Date(a.timestamp);
+  return dt > 0 && dt <= 90 * 60 * 1000;
+}
+
 function findContiguous(points, threshold) {
   const result = [];
   let current = [];
   for (const p of points) {
-    if (isDaylight(p.timestamp) && p.score >= threshold) current.push(p);
-    else {
+    const continues = !current.length || areHourlyNeighbors(current.at(-1), p);
+    if (isDaylight(p.timestamp) && p.score >= threshold && continues) {
+      current.push(p);
+    } else {
       if (current.length >= KINTI_PROFILE.minWindowHours) result.push(current);
-      current = [];
+      current = (isDaylight(p.timestamp) && p.score >= threshold) ? [p] : [];
     }
   }
   if (current.length >= KINTI_PROFILE.minWindowHours) result.push(current);
   return result;
 }
 
-function toWindow(group, fallback = false) {
+function relationForDate(dateKey, referenceDateKey, orderedDates) {
+  if (dateKey === referenceDateKey) return 'today';
+  const index = orderedDates.indexOf(dateKey);
+  const refIndex = orderedDates.indexOf(referenceDateKey);
+  if (refIndex >= 0 && index === refIndex + 1) return 'tomorrow';
+  return 'later';
+}
+
+function toWindow(group, fallback, dayRelation) {
   const avg = Math.round(group.reduce((s,p)=>s+p.score,0) / group.length);
   const peak = group.reduce((a,b)=>a.score>b.score?a:b);
   const end = new Date(new Date(group.at(-1).timestamp).getTime() + 60*60*1000).toISOString();
   return {
     start: group[0].timestamp,
     end,
+    localDate: localDateKey(group[0].timestamp),
+    dayRelation,
     averageScore: avg,
     peakScore: peak.score,
     peakAt: peak.timestamp,
@@ -176,36 +204,60 @@ function toWindow(group, fallback = false) {
   };
 }
 
-export function detectWindows(scoredHours) {
-  let groups = findContiguous(scoredHours, KINTI_PROFILE.windowThreshold);
-  let fallback = false;
-
-  if (!groups.length) {
-    fallback = true;
-    const daylight = scoredHours.filter(h => isDaylight(h.timestamp));
-    let best = null;
-    for (let i=0; i<daylight.length-1; i++) {
-      const pair = daylight.slice(i, i+2);
-      const avg = (pair[0].score + pair[1].score) / 2;
-      if (avg >= KINTI_PROFILE.fallbackThreshold && (!best || avg > best.avg)) best = { pair, avg };
-    }
-    groups = best ? [best.pair] : [];
+function fallbackPair(points) {
+  let best = null;
+  for (let i = 0; i < points.length - 1; i++) {
+    const pair = points.slice(i, i + 2);
+    if (!areHourlyNeighbors(pair[0], pair[1])) continue;
+    const avg = (pair[0].score + pair[1].score) / 2;
+    if (avg >= KINTI_PROFILE.fallbackThreshold && (!best || avg > best.avg)) best = { pair, avg };
   }
-
-  return groups.map(g => toWindow(g, fallback))
-    .sort((a,b) => b.averageScore - a.averageScore || b.peakScore - a.peakScore)
-    .slice(0,2);
+  return best?.pair ?? null;
 }
 
-export function buildSurfSummary(payload) {
+export function detectWindows(scoredHours, referenceIso = scoredHours[0]?.timestamp) {
+  if (!scoredHours.length || !referenceIso) return [];
+  const referenceMs = new Date(referenceIso).getTime();
+  const future = scoredHours
+    .filter(p => new Date(p.timestamp).getTime() >= referenceMs && isDaylight(p.timestamp))
+    .sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+  if (!future.length) return [];
+
+  const referenceDateKey = localDateKey(referenceIso);
+  const orderedDates = [...new Set([referenceDateKey, ...future.map(p => localDateKey(p.timestamp))])];
+  const windows = [];
+
+  for (const dateKey of orderedDates) {
+    const points = future.filter(p => localDateKey(p.timestamp) === dateKey);
+    if (!points.length) continue;
+    const relation = relationForDate(dateKey, referenceDateKey, orderedDates);
+    const goodGroups = findContiguous(points, KINTI_PROFILE.windowThreshold)
+      .map(g => toWindow(g, false, relation))
+      .sort((a,b) => b.averageScore - a.averageScore || b.peakScore - a.peakScore);
+
+    if (goodGroups.length) {
+      windows.push(...goodGroups);
+    } else {
+      const pair = fallbackPair(points);
+      if (pair) windows.push(toWindow(pair, true, relation));
+    }
+    if (windows.length >= 2) break;
+  }
+
+  // Keep chronological day priority (today before tomorrow), but choose the
+  // strongest window when there are multiple windows on the same day.
+  return windows.slice(0, 2);
+}
+
+export function buildSurfSummary(payload, referenceIso = payload.generatedAt) {
   const scored = scoreForecast(payload.hours);
-  const windows = detectWindows(scored);
-  const now = new Date(payload.generatedAt);
+  const windows = detectWindows(scored, referenceIso);
+  const now = new Date(referenceIso);
   let current = scored[0];
   for (const point of scored) {
     if (new Date(point.timestamp) <= now) current = point;
   }
-  return { ...payload, hours: scored, current, windows };
+  return { ...payload, referenceTime: referenceIso, hours: scored, current, windows };
 }
 
 export { KINTI_PROFILE };
