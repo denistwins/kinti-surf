@@ -9,6 +9,7 @@ on:
       - 'surf-engine.js'
       - 'kinti-wind-engine.js'
       - 'kinti-wind-floating.js'
+      - 'kinti-conditions-floating.js'
       - 'backend/score_wind_live.mjs'
       - '.github/workflows/lint-widget.yml'
 
@@ -26,5 +27,6 @@ jobs:
           node --check kinti-surf-floating.js
           node --check kinti-wind-engine.js
           if [ -f kinti-wind-floating.js ]; then node --check kinti-wind-floating.js; fi
+          if [ -f kinti-conditions-floating.js ]; then node --check kinti-conditions-floating.js; fi
       - name: Score live Kinti Wind feed
         run: node backend/score_wind_live.mjs
