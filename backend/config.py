@@ -2,9 +2,11 @@ SPOT = {
     "name": "Máncora",
     "break_lat": -4.106,
     "break_lon": -81.060,
-    # Initial offshore reference ~9 km W. We will calibrate nearest valid ocean cell.
-    "ocean_lat": -4.106,
-    "ocean_lon": -81.143,
+    # Provisional Copernicus ocean grid cell selected after spatial calibration:
+    # ~12 km offshore and close to the break latitude. We will keep validating it
+    # across multiple model runs and local observations before declaring it final.
+    "ocean_lat": -4.083333,
+    "ocean_lon": -81.166667,
     "timezone": "America/Lima",
 }
 
