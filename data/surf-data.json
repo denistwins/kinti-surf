@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T19:00:00Z",
+  "spot": {
+    "name": "Máncora",
+    "breakLat": -4.106,
+    "breakLon": -81.06,
+    "oceanReferenceLat": -4.106,
+    "oceanReferenceLon": -81.143
+  },
+  "source": {
+    "mode": "demo",
+    "wave": "Copernicus Marine (estructura)",
+    "weather": "NOAA GFS (estructura)"
+  },
+  "hours": []
+}
