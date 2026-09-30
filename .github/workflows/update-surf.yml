@@ -1,12 +1,20 @@
 name: Update Kinti Surf
 
 on:
-  # Refresh the source forecast every 3 hours. The public widget itself
+  # Refresh source forecasts every 3 hours. The public floating widget itself
   # re-reads the generated JSON every hour, so visitors get an hourly refresh
   # without hammering NOAA NOMADS with ~25 GRIB requests every hour.
   schedule:
     - cron: '17 */3 * * *'
   workflow_dispatch:
+  # Also publish immediately when the data pipeline/configuration changes.
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-surf.yml'
+      - 'backend/update_surf.py'
+      - 'backend/providers/**'
+      - 'backend/config.py'
 
 permissions:
   contents: write
