@@ -1,4 +1,4 @@
-name: Validate Kinti Surf Widget
+name: Validate Kinti Widgets
 
 on:
   workflow_dispatch:
@@ -7,6 +7,9 @@ on:
     paths:
       - 'kinti-surf-floating.js'
       - 'surf-engine.js'
+      - 'kinti-wind-engine.js'
+      - 'kinti-wind-floating.js'
+      - 'backend/score_wind_live.mjs'
       - '.github/workflows/lint-widget.yml'
 
 jobs:
@@ -21,3 +24,7 @@ jobs:
         run: |
           node --check surf-engine.js
           node --check kinti-surf-floating.js
+          node --check kinti-wind-engine.js
+          if [ -f kinti-wind-floating.js ]; then node --check kinti-wind-floating.js; fi
+      - name: Score live Kinti Wind feed
+        run: node backend/score_wind_live.mjs
