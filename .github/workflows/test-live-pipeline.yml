@@ -1,0 +1,44 @@
+name: Test Live Kinti Surf Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/test-live-pipeline.yml'
+      - 'backend/update_surf.py'
+      - 'backend/providers/copernicus.py'
+      - 'backend/providers/noaa.py'
+      - 'backend/config.py'
+
+jobs:
+  live-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: pip install -r backend/requirements.txt
+      - name: Build live surf data without committing
+        env:
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUSMARINE_SERVICE_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUSMARINE_SERVICE_PASSWORD }}
+        run: python backend/update_surf.py
+      - name: Validate JSON output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('data/surf-data.json')
+          data=json.loads(p.read_text())
+          print('✅ LIVE PIPELINE JSON OK')
+          print('generatedAt:', data.get('generatedAt'))
+          print('spot:', data.get('spot'))
+          print('records:', len(data.get('hours', [])))
+          for row in data.get('hours', [])[:4]:
+              print(row)
+          PY
