@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-10-23T21:00:00Z",
+  "generatedAt": "2026-10-24T01:00:00Z",
   "spot": {
     "name": "Máncora",
     "breakLat": -4.106,
@@ -16,74 +16,6 @@
   },
   "hours": [
     {
-      "timestamp": "2026-10-23T21:00:00Z",
-      "swellHeightM": 1.05,
-      "swellPeriodS": 11.71,
-      "swellDirectionDeg": 216.8,
-      "waveHeightM": 1.82,
-      "windSpeedKmh": 27.3,
-      "windDirectionDeg": 217.1,
-      "gustKmh": 32.1,
-      "tideElevationM": 0.146,
-      "tideLevelNorm": 0.603,
-      "tideTrend": "steady",
-      "currentSpeedMs": 0.201,
-      "currentDirectionDeg": 239.9,
-      "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
-    },
-    {
-      "timestamp": "2026-10-23T22:00:00Z",
-      "swellHeightM": 1.057,
-      "swellPeriodS": 11.58,
-      "swellDirectionDeg": 217.0,
-      "waveHeightM": 1.793,
-      "windSpeedKmh": 25.7,
-      "windDirectionDeg": 192.5,
-      "gustKmh": 31.1,
-      "tideElevationM": -0.137,
-      "tideLevelNorm": 0.41,
-      "tideTrend": "falling",
-      "currentSpeedMs": 0.199,
-      "currentDirectionDeg": 241.9,
-      "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
-    },
-    {
-      "timestamp": "2026-10-23T23:00:00Z",
-      "swellHeightM": 1.063,
-      "swellPeriodS": 11.44,
-      "swellDirectionDeg": 217.2,
-      "waveHeightM": 1.767,
-      "windSpeedKmh": 24.8,
-      "windDirectionDeg": 197.6,
-      "gustKmh": 28.9,
-      "tideElevationM": -0.385,
-      "tideLevelNorm": 0.24,
-      "tideTrend": "falling",
-      "currentSpeedMs": 0.2,
-      "currentDirectionDeg": 246.1,
-      "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
-    },
-    {
-      "timestamp": "2026-10-24T00:00:00Z",
-      "swellHeightM": 1.07,
-      "swellPeriodS": 11.31,
-      "swellDirectionDeg": 217.4,
-      "waveHeightM": 1.74,
-      "windSpeedKmh": 26.1,
-      "windDirectionDeg": 197.9,
-      "gustKmh": 28.8,
-      "tideElevationM": -0.528,
-      "tideLevelNorm": 0.142,
-      "tideTrend": "falling",
-      "currentSpeedMs": 0.191,
-      "currentDirectionDeg": 250.6,
-      "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
-    },
-    {
       "timestamp": "2026-10-24T01:00:00Z",
       "swellHeightM": 1.073,
       "swellPeriodS": 10.63,
@@ -98,7 +30,7 @@
       "currentSpeedMs": 0.201,
       "currentDirectionDeg": 252.2,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T02:00:00Z",
@@ -115,7 +47,7 @@
       "currentSpeedMs": 0.222,
       "currentDirectionDeg": 251.2,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T03:00:00Z",
@@ -132,7 +64,7 @@
       "currentSpeedMs": 0.239,
       "currentDirectionDeg": 250.5,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T04:00:00Z",
@@ -149,7 +81,7 @@
       "currentSpeedMs": 0.268,
       "currentDirectionDeg": 247.5,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T05:00:00Z",
@@ -166,7 +98,7 @@
       "currentSpeedMs": 0.311,
       "currentDirectionDeg": 245.9,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T06:00:00Z",
@@ -183,7 +115,7 @@
       "currentSpeedMs": 0.346,
       "currentDirectionDeg": 245.5,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T07:00:00Z",
@@ -200,7 +132,7 @@
       "currentSpeedMs": 0.381,
       "currentDirectionDeg": 244.9,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T08:00:00Z",
@@ -217,7 +149,7 @@
       "currentSpeedMs": 0.41,
       "currentDirectionDeg": 244.8,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T09:00:00Z",
@@ -234,7 +166,7 @@
       "currentSpeedMs": 0.432,
       "currentDirectionDeg": 244.7,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T10:00:00Z",
@@ -251,7 +183,7 @@
       "currentSpeedMs": 0.439,
       "currentDirectionDeg": 246.1,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T11:00:00Z",
@@ -268,7 +200,7 @@
       "currentSpeedMs": 0.45,
       "currentDirectionDeg": 247.3,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T12:00:00Z",
@@ -285,7 +217,7 @@
       "currentSpeedMs": 0.445,
       "currentDirectionDeg": 247.9,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T13:00:00Z",
@@ -302,7 +234,7 @@
       "currentSpeedMs": 0.432,
       "currentDirectionDeg": 246.6,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T14:00:00Z",
@@ -319,7 +251,7 @@
       "currentSpeedMs": 0.432,
       "currentDirectionDeg": 245.0,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T15:00:00Z",
@@ -336,7 +268,7 @@
       "currentSpeedMs": 0.426,
       "currentDirectionDeg": 242.4,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T16:00:00Z",
@@ -353,7 +285,7 @@
       "currentSpeedMs": 0.408,
       "currentDirectionDeg": 242.6,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T17:00:00Z",
@@ -370,7 +302,7 @@
       "currentSpeedMs": 0.395,
       "currentDirectionDeg": 241.9,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T18:00:00Z",
@@ -387,7 +319,7 @@
       "currentSpeedMs": 0.391,
       "currentDirectionDeg": 240.9,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T19:00:00Z",
@@ -404,7 +336,7 @@
       "currentSpeedMs": 0.406,
       "currentDirectionDeg": 240.2,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T20:00:00Z",
@@ -421,7 +353,7 @@
       "currentSpeedMs": 0.418,
       "currentDirectionDeg": 238.8,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
     },
     {
       "timestamp": "2026-10-24T21:00:00Z",
@@ -438,7 +370,75 @@
       "currentSpeedMs": 0.422,
       "currentDirectionDeg": 237.1,
       "waveDataAgeHours": null,
-      "weatherDataAgeHours": 3.0
+      "weatherDataAgeHours": 7.0
+    },
+    {
+      "timestamp": "2026-10-24T22:00:00Z",
+      "swellHeightM": 0.897,
+      "swellPeriodS": 9.79,
+      "swellDirectionDeg": 216.8,
+      "waveHeightM": 1.397,
+      "windSpeedKmh": 23.6,
+      "windDirectionDeg": 238.7,
+      "gustKmh": 21.2,
+      "tideElevationM": 0.094,
+      "tideLevelNorm": 0.567,
+      "tideTrend": "falling",
+      "currentSpeedMs": 0.427,
+      "currentDirectionDeg": 236.2,
+      "waveDataAgeHours": null,
+      "weatherDataAgeHours": 7.0
+    },
+    {
+      "timestamp": "2026-10-24T23:00:00Z",
+      "swellHeightM": 0.903,
+      "swellPeriodS": 9.28,
+      "swellDirectionDeg": 216.6,
+      "waveHeightM": 1.373,
+      "windSpeedKmh": 23.7,
+      "windDirectionDeg": 227.3,
+      "gustKmh": 23.1,
+      "tideElevationM": -0.24,
+      "tideLevelNorm": 0.339,
+      "tideTrend": "falling",
+      "currentSpeedMs": 0.417,
+      "currentDirectionDeg": 235.7,
+      "waveDataAgeHours": null,
+      "weatherDataAgeHours": 7.0
+    },
+    {
+      "timestamp": "2026-10-25T00:00:00Z",
+      "swellHeightM": 0.91,
+      "swellPeriodS": 8.76,
+      "swellDirectionDeg": 216.3,
+      "waveHeightM": 1.35,
+      "windSpeedKmh": 24.9,
+      "windDirectionDeg": 216.1,
+      "gustKmh": 24.9,
+      "tideElevationM": -0.503,
+      "tideLevelNorm": 0.16,
+      "tideTrend": "falling",
+      "currentSpeedMs": 0.391,
+      "currentDirectionDeg": 235.1,
+      "waveDataAgeHours": null,
+      "weatherDataAgeHours": 7.0
+    },
+    {
+      "timestamp": "2026-10-25T01:00:00Z",
+      "swellHeightM": 0.9,
+      "swellPeriodS": 9.04,
+      "swellDirectionDeg": 216.5,
+      "waveHeightM": 1.307,
+      "windSpeedKmh": 21.7,
+      "windDirectionDeg": 209.5,
+      "gustKmh": 21.6,
+      "tideElevationM": -0.62,
+      "tideLevelNorm": 0.079,
+      "tideTrend": "falling",
+      "currentSpeedMs": 0.365,
+      "currentDirectionDeg": 234.9,
+      "waveDataAgeHours": null,
+      "weatherDataAgeHours": 7.0
     }
   ]
 }
